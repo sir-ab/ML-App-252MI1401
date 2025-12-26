@@ -1,0 +1,24 @@
+{
+  "model_name": "Logistic Regression",
+  "test_metrics": {
+    "Accuracy": 0.6448435259801256,
+    "Precision": 0.6326204567735376,
+    "Recall": 0.4834350721420644,
+    "F1": 0.5480568094241991,
+    "ROC-AUC": 0.691787498353785
+  },
+  "features": {
+    "numeric": [
+      "DayOfWeek",
+      "Time",
+      "Length"
+    ],
+    "categorical": [
+      "Airline",
+      "AirportFrom",
+      "AirportTo"
+    ]
+  },
+  "gpu_used": false,
+  "timestamp": "2025-12-26 17:21:41"
+}

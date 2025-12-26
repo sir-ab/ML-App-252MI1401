@@ -12,81 +12,194 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- MAPPINGS (Full Names vs Model Inputs) ---
+# NOTE: Keys match what the model expects (from training data). 
+# Values are what the user sees.
+
+AIRLINE_MAPPING = {
+    'Alaska': 'Alaska Airlines (AS)',
+    'American': 'American Airlines (AA)',
+    'Air Canada': 'Air Canada (AC)',
+    'Aeromexico': 'Aeromexico (AM)',
+    'Continental': 'Continental Airlines (CO)',
+    'Delta': 'Delta Airlines (DL)',
+    'FedEx': 'FedEx (FX)',
+    'Hawaiian': 'Hawaiian Airlines (HA)',
+    'Northwest': 'Northwest Airlines (NW)',
+    'Polar': 'Polar Air Cargo (PO)',
+    'Southwest': 'Southwest Airlines (WN)',
+    'United': 'United Airlines (UA)',
+    'UPS': 'United Parcel Service (5X)',
+    'Virgin': 'Virgin Atlantic (VS)',
+    'Viva': 'VivaAerobús (VB)',
+    'WestJet': 'WestJet (WS)',
+    'JetBlue': 'JetBlue Airways (B6)',
+    'Spirit': 'Spirit Airlines (NK)',
+    'Frontier': 'Frontier Airlines (F9)',
+    'Unknown': 'Other / Unknown'
+}
+
+AIRPORT_MAPPING = {
+    'ATL': 'ATL - Hartsfield-Jackson Atlanta Intl (GA)',
+    'AUS': 'AUS - Austin-Bergstrom Intl (TX)',
+    'BNA': 'BNA - Nashville Intl (TN)',
+    'BOS': 'BOS - Boston Logan Intl (MA)',
+    'BWI': 'BWI - Baltimore-Washington Intl (WA)',
+    'CLT': 'CLT - Charlotte Douglas Intl (NC)',
+    'DAL': 'DAL - Dallas Love Field (TX)',
+    'DCA': 'DCA - Ronald Reagan Washington National (VA)',
+    'DEN': 'DEN - Denver Intl (CO)',
+    'DFW': 'DFW - Dallas/Fort Worth Intl (TX)',
+    'DTW': 'DTW - Detroit Metropolitan (MI)',
+    'EWR': 'EWR - Newark Liberty Intl (NJ)',
+    'FLL': 'FLL - Fort Lauderdale–Hollywood Intl (FL)',
+    'HNL': 'HNL - Daniel K. Inouye Intl (HI)',
+    'HOU': 'HOU - William P. Hobby (TX)',
+    'IAD': 'IAD - Dulles Intl (VA)',
+    'IAH': 'IAH - George Bush Intercontinental (TX)',
+    'JFK': 'JFK - John F. Kennedy Intl (NY)',
+    'LAS': 'LAS - McCarran Intl (NV)',
+    'LAX': 'LAX - Los Angeles Intl (CA)',
+    'LGA': 'LGA - LaGuardia (NY)',
+    'MCO': 'MCO - Orlando Intl (FL)',
+    'MDW': 'MDW - Chicago Midway Intl (IL)',
+    'MIA': 'MIA - Miami Intl (FL)',
+    'MSP': 'MSP - Minneapolis–Saint Paul Intl (MN)',
+    'MSY': 'MSY - Louis Armstrong New Orleans Intl (LA)',
+    'OAK': 'OAK - Oakland Intl (CA)',
+    'ORD': 'ORD - O\'Hare Intl (IL)',
+    'PDX': 'PDX - Portland Intl (OR)',
+    'PHL': 'PHL - Philadelphia Intl (PA)',
+    'PHX': 'PHX - Phoenix Sky Harbor Intl (AZ)',
+    'RDU': 'RDU - Raleigh-Durham Intl (NC)',
+    'SAN': 'SAN - San Diego Intl (CA)',
+    'SEA': 'SEA - Seattle–Tacoma Intl (WA)',
+    'SFO': 'SFO - San Francisco Intl (CA)',
+    'SJC': 'SJC - Norman Y. Mineta San Jose Intl (CA)',
+    'SLC': 'SLC - Salt Lake City Intl (UT)',
+    'SMF': 'SMF - Sacramento Intl (CA)',
+    'STL': 'STL - St. Louis Lambert Intl (MO)',
+    'TPA': 'TPA - Tampa Intl (FL)'
+}
+
 # --- Custom CSS ---
 st.markdown("""
     <style>
-    .main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
+    /* Main Background */
     .stApp {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-    .prediction-card {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        margin: 20px 0;
-    }
-    .metric-container {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        padding: 20px;
-        border-radius: 15px;
-        color: white;
-        text-align: center;
-        margin: 10px 0;
-    }
-    .success-box {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        padding: 25px;
-        border-radius: 15px;
-        color: white;
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-        margin: 20px 0;
-        box-shadow: 0 8px 25px rgba(17, 153, 142, 0.3);
-    }
-    .warning-box {
-        background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-        padding: 25px;
-        border-radius: 15px;
-        color: white;
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-        margin: 20px 0;
-        box-shadow: 0 8px 25px rgba(238, 9, 121, 0.3);
-    }
-    .info-card {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 20px;
-        border-radius: 15px;
-        margin: 10px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
+    
+    /* Global Headers (White on the purple background) */
     h1, h2, h3 {
         color: white !important;
     }
+
+    /* --- SIDEBAR --- */
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 2rem;
+        padding-bottom: 1rem;
+    }
+    .sidebar-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        color: #2c3e50;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    /* Force text inside sidebar card to be dark */
+    .sidebar-card b, .sidebar-card div {
+        color: #2c3e50 !important;
+    }
+
+    /* --- FORM STYLING --- */
+    [data-testid="stForm"] {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        border: none;
+    }
+    [data-testid="stForm"] label {
+        color: #2c3e50 !important;
+        font-weight: 600;
+    }
+    /* Force "Flight Information" header inside form to be dark */
+    [data-testid="stForm"] h3 {
+        color: #2c3e50 !important; 
+        margin-top: 0;
+    }
+    .stSelectbox, .stNumberInput, .stTextInput, .stTimeInput {
+        color: #2c3e50;
+    }
     .stButton>button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: white !important;
         font-size: 18px;
         font-weight: bold;
-        padding: 15px 40px;
+        padding: 15px 0px;
         border-radius: 50px;
         border: none;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
-        width: 100%;
     }
     .stButton>button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
-    .stSelectbox, .stNumberInput {
+
+    /* --- RESULT BOXES --- */
+    .result-box {
+        padding: 25px;
+        border-radius: 15px;
+        color: white !important;
+        text-align: center;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    /* Blue Gradient for On Time */
+    .success-bg { 
+        background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%); 
+    }
+    /* Orange Gradient for Delay (Colorblind safe) */
+    .warning-bg { 
+        background: linear-gradient(135deg, #f12711 0%, #f5af19 100%); 
+    }
+    
+    /* --- WHITE METRICS CARD --- */
+    .metrics-card {
         background: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    /* CRITICAL: Force text black inside the white metrics card */
+    .metrics-card h3, .metrics-card div {
+        color: #2c3e50 !important;
+    }
+
+    .metric-container {
+        padding: 15px;
         border-radius: 10px;
+        text-align: center;
+        color: white !important;
+        margin-top: 10px;
+    }
+    .metric-container div {
+        color: white !important;
+    }
+
+    /* --- RECOMMENDATION BOX --- */
+    .rec-box {
+        background: rgba(255, 255, 255, 0.95);
+        border-left: 5px solid #667eea;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 20px;
+        color: #2c3e50;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -102,225 +215,184 @@ def load_model():
     except FileNotFoundError:
         st.error("Model files not found. Please run the training script first.")
         st.stop()
+    except Exception as e:
+        # Fallback for version mismatch if user didn't retrain
+        st.error(f"Error loading model: {e}")
+        st.stop()
 
 model, model_info = load_model()
-
-# --- Header ---
-st.markdown("""
-    <div style='text-align: center; padding: 20px; margin-bottom: 30px;'>
-        <h1 style='font-size: 48px; margin-bottom: 10px;'>Flight Delay Predictor</h1>
-        <p style='font-size: 20px; color: rgba(255,255,255,0.9);'>
-            Predict flight delays using machine learning
-        </p>
-    </div>
-""", unsafe_allow_html=True)
 
 # --- Sidebar Info ---
 with st.sidebar:
     st.markdown("### Model Information")
     st.markdown(f"""
-    <div class='info-card'>
-        <b>Model:</b> {model_info.get('model_name', 'N/A')}<br>
-        <b>Accuracy:</b> {model_info.get('metrics', {}).get('Accuracy', 0):.2%}<br>
-        <b>F1 Score:</b> {model_info.get('metrics', {}).get('F1 Score', 0):.2%}<br>
-        <b>Training Samples:</b> {model_info.get('training_samples', 'N/A'):,}<br>
-        <b>Last Updated:</b> {model_info.get('training_date', 'N/A')}
+    <div class='sidebar-card'>
+        <b>Algo:</b> {model_info.get('model_name', 'N/A')}<br>
     </div>
     """, unsafe_allow_html=True)
-    
+    st.markdown("### Historical Delay")
+    delay_rate = model_info.get('delay_rate', 0.4) # Default 0.3 if missing
+    st.metric("Avg Delay Rate", f"{delay_rate:.1%}")
+    st.progress(delay_rate)
     st.markdown("---")
-    
     st.markdown("### How It Works")
     st.info("""
     Enter your flight details and get an instant prediction on whether your flight is likely to be delayed.
     """)
-    
-    st.markdown("---")
-    
-    st.markdown("### Statistics")
-    delay_rate = model_info.get('delay_rate', 0)
-    st.metric("Historical Delay Rate", f"{delay_rate:.1%}")
-    st.progress(delay_rate)
+
+# --- Header ---
+st.markdown("""
+    <div style='text-align: center; padding: 10px; margin-bottom: 20px;'>
+        <h1 style='font-size: 42px; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);'>Flight Delay Predictor</h1>
+        <p style='font-size: 18px; color: rgba(255,255,255,0.9);'>AI-Powered Flight Status Forecasting</p>
+    </div>
+""", unsafe_allow_html=True)
 
 # --- Main Form ---
-st.markdown("<div class='prediction-card'>", unsafe_allow_html=True)
-
-# Get feature information
-numeric_features = model_info.get('features', {}).get('numeric', [])
-categorical_features = model_info.get('features', {}).get('categorical', [])
-
+# We use the native st.form which we styled with CSS to look like a card
+# This removes the "White Bar" issue caused by nested divs
 with st.form("flight_form"):
-    st.markdown("### Flight Information")
+    st.markdown("### ✈️ Flight Information")
+    
+    # Get feature information
+    numeric_features = model_info.get('features', {}).get('numeric', [])
+    categorical_features = model_info.get('features', {}).get('categorical', [])
     
     col1, col2, col3 = st.columns(3)
-    
-    # Dictionary to store form inputs
     form_data = {}
     
-    # Dynamically create inputs based on features
-    for i, feature in enumerate(categorical_features + numeric_features):
-        col = [col1, col2, col3][i % 3]
-        
+    # Helper to determine where to place input
+    cols = [col1, col2, col3]
+    
+    # 1. Airline (First)
+    with col1:
+        # Use keys from AIRLINE_MAPPING for options, but display values
+        # We need to make sure we include options that the model knows but might not be in our map
+        # For this example, we default to the map.
+        airline_options = list(AIRLINE_MAPPING.keys())
+        form_data['Airline'] = st.selectbox(
+            "Airline Carrier", 
+            options=airline_options,
+            format_func=lambda x: AIRLINE_MAPPING.get(x, x)
+        )
+
+    # 2. Airports
+    with col2:
+        airport_options = list(AIRPORT_MAPPING.keys())
+        form_data['AirportFrom'] = st.selectbox(
+            "Origin Airport", 
+            options=airport_options,
+            format_func=lambda x: AIRPORT_MAPPING.get(x, x)
+        )
+    
+    with col3:
+        form_data['AirportTo'] = st.selectbox(
+            "Destination Airport", 
+            options=airport_options,
+            format_func=lambda x: AIRPORT_MAPPING.get(x, x)
+        )
+
+    # 3. Other Features (Dynamic)
+    # We filter out the ones we already placed manually
+    remaining_features = [f for f in (categorical_features + numeric_features) 
+                         if f not in ['Airline', 'AirportFrom', 'AirportTo']]
+    
+    for i, feature in enumerate(remaining_features):
+        col = cols[i % 3]
         with col:
-            # Format feature name for display
             display_name = feature.replace('_', ' ').title()
             
-            if feature in categorical_features:
-                # For categorical features, provide common options
-                if 'airline' in feature.lower():
-                    options = ['Southwest', 'Delta', 'American', 'United', 'JetBlue', 'Spirit', 'Alaska', 'Frontier']
-                    form_data[feature] = st.selectbox(display_name, options)
-                
-                elif 'airport' in feature.lower() and 'from' in feature.lower():
-                    options = ['ATL', 'DFW', 'DEN', 'ORD', 'LAX', 'CLT', 'MCO', 'LAS', 'PHX', 'MIA', 'JFK', 'SFO', 'SEA', 'BOS', 'EWR']
-                    form_data[feature] = st.selectbox(f"Origin {display_name.replace('Airport From', '')}", options)
-                
-                elif 'airport' in feature.lower() and 'to' in feature.lower():
-                    options = ['ATL', 'DFW', 'DEN', 'ORD', 'LAX', 'CLT', 'MCO', 'LAS', 'PHX', 'MIA', 'JFK', 'SFO', 'SEA', 'BOS', 'EWR']
-                    form_data[feature] = st.selectbox(f"Destination {display_name.replace('Airport To', '')}", options)
-                
-                else:
-                    form_data[feature] = st.text_input(display_name, value="Unknown")
+            if 'day' in feature.lower() and 'week' in feature.lower():
+                form_data[feature] = st.selectbox(
+                    display_name,
+                    options=[1, 2, 3, 4, 5, 6, 7],
+                    format_func=lambda x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x-1]
+                )
+            
+            elif 'time' in feature.lower() or 'hour' in feature.lower():
+                time_val = st.time_input(display_name, value=time(6, 00))
+                form_data[feature] = time_val.hour * 100 + time_val.minute
+            
+            elif 'length' in feature.lower():
+                form_data[feature] = st.number_input(f"{display_name} (min)", 30, 600, 180, 15)
             
             elif feature in numeric_features:
-                # For numeric features, provide appropriate ranges
-                if 'day' in feature.lower() and 'week' in feature.lower():
-                    form_data[feature] = st.selectbox(
-                        display_name,
-                        options=[1, 2, 3, 4, 5, 6, 7],
-                        format_func=lambda x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x-1]
-                    )
-                
-                elif 'time' in feature.lower() or 'hour' in feature.lower():
-                    time_val = st.time_input(display_name, value=time(14, 30))
-                    form_data[feature] = time_val.hour * 100 + time_val.minute
-                
-                elif 'length' in feature.lower() or 'duration' in feature.lower():
-                    form_data[feature] = st.number_input(
-                        f"{display_name} (minutes)",
-                        min_value=30,
-                        max_value=600,
-                        value=180,
-                        step=15
-                    )
-                
-                elif 'distance' in feature.lower():
-                    form_data[feature] = st.number_input(
-                        f"{display_name} (miles)",
-                        min_value=100,
-                        max_value=3000,
-                        value=500,
-                        step=50
-                    )
-                
-                else:
-                    form_data[feature] = st.number_input(
-                        display_name,
-                        min_value=0.0,
-                        value=100.0,
-                        step=10.0
-                    )
-    
+                 form_data[feature] = st.number_input(display_name, value=100)
+            
+            else:
+                form_data[feature] = st.text_input(display_name, value="Unknown")
+
     st.markdown("<br>", unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
+    # Center the button
+    c1, c2, c3 = st.columns([1, 2, 1])
+    with c2:
         submit = st.form_submit_button("Predict Flight Status", use_container_width=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 # --- Prediction Results ---
 if submit:
-    with st.spinner("Analyzing flight data..."):
-        # Create DataFrame for prediction
-        input_data = pd.DataFrame([form_data])
+    with st.spinner("Calculating probabilities..."):
+        input_df = pd.DataFrame([form_data])
         
-        # Make prediction
         try:
-            prediction = model.predict(input_data)[0]
-            probability = model.predict_proba(input_data)[0]
+            # Get Probability
+            proba = model.predict_proba(input_df)[0]
+            prob_delay = proba[1]
+            prob_ontime = proba[0]
             
-            # Display results
-            if prediction == 0:
+            # Custom Threshold Logic
+            THRESHOLD = 0.5
+            is_delayed = prob_delay >= THRESHOLD
+            
+            # 1. Main Status Box
+            if is_delayed:
                 st.markdown(f"""
-                <div class='success-box'>
-                    Flight On Time
-                    <div style='font-size: 16px; margin-top: 10px; font-weight: normal;'>
-                        This flight is predicted to depart on schedule
-                    </div>
+                <div class='result-box warning-bg'>
+                    <div style='font-size: 32px; font-weight: bold;'>⚠️ HIGH DELAY RISK</div>
+                    <div style='font-size: 18px; margin-top: 5px;'>Likelihood: {prob_delay:.1%}</div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
-                <div class='warning-box'>
-                    Flight Delayed
-                    <div style='font-size: 16px; margin-top: 10px; font-weight: normal;'>
-                        This flight may experience delays
+                <div class='result-box success-bg'>
+                    <div style='font-size: 32px; font-weight: bold;'>✅ LIKELY ON TIME</div>
+                    <div style='font-size: 18px; margin-top: 5px;'>On-Time Probability: {prob_ontime:.1%}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # 2. Detailed Metrics (White Card)
+            # Added 'metrics-card' class to handle text color
+            st.markdown(f"""
+            <div class='metrics-card'>
+                <h3 style='margin-top: 0; margin-bottom: 15px;'>Confidence Analysis</h3>
+                <div style='display: flex; gap: 20px; justify-content: center;'>
+                    <div style='flex: 1; background: #2193b0; padding: 15px; border-radius: 10px; text-align: center; color: white;'>
+                        <div style='font-size: 14px; opacity: 0.9; color: white !important;'>On Time</div>
+                        <div style='font-size: 28px; font-weight: bold; color: white !important;'>{prob_ontime:.1%}</div>
+                    </div>
+                    <div style='flex: 1; background: #f5af19; padding: 15px; border-radius: 10px; text-align: center; color: white;'>
+                        <div style='font-size: 14px; opacity: 0.9; color: white !important;'>Delayed</div>
+                        <div style='font-size: 28px; font-weight: bold; color: white !important;'>{prob_delay:.1%}</div>
                     </div>
                 </div>
-                """, unsafe_allow_html=True)
+            </div>
+            """, unsafe_allow_html=True)
             
-            # Probability visualization
-            st.markdown("<div class='prediction-card'>", unsafe_allow_html=True)
-            st.markdown("### Prediction Confidence")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown(f"""
-                <div class='metric-container' style='background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);'>
-                    <h3 style='margin: 0; color: white;'>On Time</h3>
-                    <h1 style='margin: 10px 0; color: white;'>{probability[0]:.1%}</h1>
+            # 3. Recommendations (Custom styled box)
+            if is_delayed:
+                st.markdown("""
+                <div class='rec-box'>
+                    <b>Recommendation:</b> This flight has a high risk of delay.<br>
+                    Please check your connection times, bring extra entertainment, and monitor the airline app.
                 </div>
                 """, unsafe_allow_html=True)
-                st.progress(probability[0])
-            
-            with col2:
-                st.markdown(f"""
-                <div class='metric-container' style='background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);'>
-                    <h3 style='margin: 0; color: white;'>Delayed</h3>
-                    <h1 style='margin: 10px 0; color: white;'>{probability[1]:.1%}</h1>
-                </div>
-                """, unsafe_allow_html=True)
-                st.progress(probability[1])
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-            # Travel tips
-            st.markdown("<div class='prediction-card'>", unsafe_allow_html=True)
-            st.markdown("### Recommendations")
-            
-            if prediction == 1:
-                st.warning("""
-                **Your flight may be delayed. Consider these steps:**
-                - Check with your airline for real-time updates
-                - Have backup accommodation information ready
-                - Bring entertainment and snacks
-                - Arrive early at the airport
-                - Keep airline customer service contact handy
-                """)
             else:
-                st.success("""
-                **Your flight looks good. General travel tips:**
-                - Arrive 2 hours early for domestic flights
-                - Check in online to save time
-                - Review baggage allowances beforehand
-                - Download the airline app for gate updates
-                - Plan your airport transportation in advance
-                """)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+                 st.markdown("""
+                <div class='rec-box' style='border-left-color: #2193b0;'>
+                    <b>Recommendation:</b> Flight looks good.<br>
+                    Arrive at the airport 2 hours early and have a safe trip!
+                </div>
+                """, unsafe_allow_html=True)
             
         except Exception as e:
-            st.error(f"Error making prediction: {str(e)}")
-            st.info("Please ensure all required fields are filled correctly.")
-
-# --- Footer ---
-st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("""
-    <div style='text-align: center; color: rgba(255,255,255,0.7); padding: 20px;'>
-        <p>Built with Streamlit and Scikit-learn</p>
-        <p style='font-size: 12px;'>Predictions are based on historical data and machine learning models. 
-        Always verify with your airline for official updates.</p>
-    </div>
-""", unsafe_allow_html=True)
+            st.error(f"Prediction Error: {str(e)}")
