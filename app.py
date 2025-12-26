@@ -243,7 +243,7 @@ with st.sidebar:
 # --- Header ---
 st.markdown("""
     <div style='text-align: center; padding: 10px; margin-bottom: 20px;'>
-        <h1 style='font-size: 42px; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);'>Flight Delay Predictor</h1>
+        <h1 style='font-size: 42px; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);'>⋆｡ﾟ☁︎｡✈︎⋆｡☾Flight Delay Predictor ⋆｡ﾟ☁︎｡✈︎⋆｡☾</h1>
         <p style='font-size: 18px; color: rgba(255,255,255,0.9);'>AI-Powered Flight Status Forecasting</p>
     </div>
 """, unsafe_allow_html=True)
